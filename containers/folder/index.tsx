@@ -11,6 +11,7 @@ import { Links, folderOptionType } from "@/dataType/dataType";
 import { AccountContext } from "@/contexts/AccountContext";
 import styles from "./folder.module.css";
 import { useRouter } from "next/router";
+import { FolderLayout } from "@/components/Layout";
 
 const modalBg = {
   background: "#000",
@@ -29,7 +30,7 @@ interface QueryFetchType {
   fetchUrl?: (type: string, number: string | null) => Promise<void>;
 }
 
-const Folder = () => {
+const FolderContainer = () => {
   const {
     account,
     isVisible,
@@ -161,7 +162,7 @@ const Folder = () => {
     return;
   }
   return (
-    <>
+    <FolderLayout>
       <div className={styles.folder}>
         <AddInputSection
           handleListClick={handleListClick}
@@ -218,8 +219,8 @@ const Folder = () => {
         ) : null}
       </div>
       <div className="observerSecond" ref={targetSecondElement}></div>
-    </>
+    </FolderLayout>
   );
 };
 
-export default Folder;
+export default FolderContainer;

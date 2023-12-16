@@ -8,13 +8,14 @@ import { folders } from "@/dataType/dataType";
 import { AccountContext } from "@/contexts/AccountContext";
 import { useRouter } from "next/router";
 import styles from "./shared.module.css";
+import { SharedLayout } from "@/components/Layout";
 
 interface QueryType {
   user?: string | string[];
   folder?: string | string[];
 }
 
-const Shared = () => {
+const SharedContainer = () => {
   const { account, errorMessage, searchResult, setSearchResult } =
     useContext(AccountContext);
   const router = useRouter();
@@ -54,27 +55,29 @@ const Shared = () => {
   if (!bookmarkNumber) return;
 
   return (
-    <div className={styles.shared}>
-      <BookMark
-        bookmarkNumber={getBookmarkNumber()}
-        account={account?.data[0]}
-        errorMessage={errorMessage}
-      />
-      <Search setSearchResult={setSearchResult} searchResult={searchResult} />
-      {!linksErrorMessage ? (
-        bookmarkNumber.link.count > 0 ? (
-          <Cards
-            linkCardsData={personalfolderData}
-            searchResult={searchResult}
-          />
+    <SharedLayout>
+      <div className={styles.shared}>
+        <BookMark
+          bookmarkNumber={getBookmarkNumber()}
+          account={account?.data[0]}
+          errorMessage={errorMessage}
+        />
+        <Search setSearchResult={setSearchResult} searchResult={searchResult} />
+        {!linksErrorMessage ? (
+          bookmarkNumber.link.count > 0 ? (
+            <Cards
+              linkCardsData={personalfolderData}
+              searchResult={searchResult}
+            />
+          ) : (
+            <h3 className={styles.noLink}>저장된 링크가 없습니다</h3>
+          )
         ) : (
-          <h3 className={styles.noLink}>저장된 링크가 없습니다</h3>
-        )
-      ) : (
-        <div className={styles.sectionTitleThird}>{linksErrorMessage}</div>
-      )}
-    </div>
+          <div className={styles.sectionTitleThird}>{linksErrorMessage}</div>
+        )}
+      </div>
+    </SharedLayout>
   );
 };
 
-export default Shared;
+export default SharedContainer;
