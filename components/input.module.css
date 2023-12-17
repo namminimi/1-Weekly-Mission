@@ -33,6 +33,14 @@
   position: relative;
 }
 
+.errorMessage {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--linkbrary-red);
+  font-size: 14px;
+  font-weight: 400;
+}
+
 .eyeIcon {
   position: absolute;
   top: 50%;

@@ -29,5 +29,5 @@ POST https://bootcamp-api.codeit.kr/api/check-email
 Content-Type: application/json
 
 {
-    "email": "test@codeit"
+    "email": "test@codeit.com"
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FormEventHandler, useState } from "react";
 import logo from "@/public/img/png/Linkbrary.png";
 import google from "@/public/img/png/Component 2.png";
 import kakao from "@/public/img/png/Component 3.png";
@@ -9,33 +9,23 @@ import styles from "./signin.module.css";
 import { API_URL } from "@/config/apiUrl";
 import { useRouter } from "next/router";
 import { SignLayout } from "@/components/Layout";
+import { useForm } from "react-hook-form";
 
 const SigninContainer = () => {
-  const router = useRouter();
-  const userToken = window.localStorage.getItem("user");
-  const [reCheck, setReCheck] = useState("");
-  const [inputValue, setInputValue] = useState({
-    email: "",
-    password: "",
+  const {
+    register,
+    handleSubmit: onSubmit,
+    formState,
+    watch,
+  } = useForm({
+    mode: "onBlur",
   });
+  const { isSubmitting } = formState;
 
-  if (userToken) {
-    router.push("/");
-  }
+  const handleSubmit = async (data: any) => {
+    console.log(data);
+    const { email, password, passwordCh } = data;
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    if (name === "email") {
-      setInputValue({ ...inputValue, email: value });
-    } else if (name === "password") {
-      setInputValue({ ...inputValue, password: value });
-    }
-  };
-
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const { email, password } = inputValue;
     if (email && password) {
       try {
         const res = await fetch(`${API_URL}sign-in`, {
@@ -43,29 +33,22 @@ const SigninContainer = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(inputValue),
+          body: JSON.stringify(data),
         });
         if (res.ok) {
           const result = await res.json();
-          const { accessToken } = result.data;
-          window.localStorage.setItem("user", accessToken);
+
           alert("환영합니다.");
-          router.push("/folder");
+          //router.push("/folder");
         } else {
           throw new Error("로그인 실패");
         }
       } catch {
-        setReCheck("disaccord");
+        console.log("로그인 실패");
       }
     } else {
-      setReCheck("disaccord");
+      console.log("로그인 못함");
     }
-  };
-
-  const inputProps = {
-    onChange,
-    reCheck,
-    setReCheck,
   };
 
   return (
@@ -83,20 +66,28 @@ const SigninContainer = () => {
               회원 가입하기
             </Link>
           </div>
-          <form className={styles.form} onSubmit={onSubmit}>
+          <form className={styles.form} onSubmit={onSubmit(handleSubmit)}>
             <div className={styles.inputBox}>
               <label className={styles.inputBoxLabel} htmlFor="email">
                 이메일
               </label>
-              <Input type={"email"} {...inputProps} />
+              <Input type={"email"} register={register} formState={formState} />
             </div>
             <div className={styles.inputBox}>
               <label className={styles.inputBoxLabel} htmlFor="password">
                 비밀번호
               </label>
-              <Input type={"password"} {...inputProps} />
+              <Input
+                type={"password"}
+                register={register}
+                formState={formState}
+              />
             </div>
-            <button className={styles.loginBtn} type="submit">
+            <button
+              className={styles.loginBtn}
+              type="submit"
+              disabled={isSubmitting}
+            >
               로그인
             </button>
           </form>

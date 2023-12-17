@@ -1,73 +1,86 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import styles from "./input.module.css";
 import Image from "next/image";
 import eyeOffIcon from "@/public/img/svg/eye-off.svg";
 import eyeOnIcon from "@/public/img/svg/eye-on.svg";
-import {
-  emailErrorMessage,
-  pwChErrorMessage,
-  pwErrorMessage,
-} from "@/utils/errorMessage";
+
+import { FieldValues, FormState, UseFormRegister } from "react-hook-form";
+import { REG_EXP } from "@/utils/constant";
+import { API_URL } from "@/config/apiUrl";
 
 interface InputType {
   type: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  reCheck: string;
-  setReCheck: React.Dispatch<React.SetStateAction<string>>;
-  password?: string;
+  register: UseFormRegister<FieldValues>;
+  formState: FormState<FieldValues>;
 }
 
-const Input = ({
-  type,
-  onChange,
-  reCheck,
-  setReCheck,
-  password,
-}: InputType) => {
+const Input = ({ type, register, formState }: InputType) => {
+  const { isSubmitted, errors } = formState;
   const [changeEyeIcon, setChangeEyeIcon] = useState<boolean>(false);
-  const [errorState, setErrorState] = useState<string>("");
-  const location = window.location.pathname;
-  const onFocus = async (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    if (name === "email") {
-      setErrorState(await emailErrorMessage(value, location));
-    } else if (name === "password") {
-      setErrorState(pwErrorMessage(value));
-    } else if (name === "passwordCheck") {
-      if (!password) return;
-      setErrorState(pwChErrorMessage(value, password));
-    }
-    setReCheck("");
-  };
 
   const onClick = () => {
     setChangeEyeIcon(!changeEyeIcon);
   };
 
-  return (
-    <div
-      className={
-        errorState || reCheck
-          ? `${styles.Container} ${type}Box ${errorState} ${reCheck}`
-          : `${styles.Container} ${type}Box`
+  const isType = () => {
+    return type === "email";
+  };
+
+  const checkDuplicateEmail = async (email: string) => {
+    try {
+      const res = await fetch(`${API_URL}check-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        // 중복된 이메일이 없는 경우의 처리
+        return false;
+      } else {
+        // 중복된 이메일이 있는 경우의 처리
+
+        return true;
       }
-    >
+    } catch (error) {
+      return true;
+    }
+  };
+
+  const message = errors[`${type}`]?.message;
+  return (
+    <>
       <div className={styles.Wrap}>
         <input
-          className={
-            errorState || reCheck
-              ? `${styles.input}  ${styles.inputError}`
-              : `${styles.input}`
-          }
-          type={changeEyeIcon || type === "email" ? "text" : "password"}
-          name={type}
-          placeholder={type === "email" ? "이메일" : "비밀번호"}
+          className={styles.input}
+          type={changeEyeIcon || isType() ? "text" : "password"}
+          id={`${type}`}
+          placeholder={isType() ? "이메일" : "비밀번호"}
           autoComplete="off"
-          onChange={onChange}
-          onBlur={onFocus}
+          aria-invalid={
+            isSubmitted ? (errors[`${type}`] ? "true" : "false") : undefined
+          }
+          {...register(`${type}`, {
+            required: isType()
+              ? "이메일을 입력해주세요"
+              : "비밀번호를 입력해주세요",
+            pattern: {
+              value: REG_EXP[isType() ? "CHECK_EMAIL" : "CHECK_PASSWORD"],
+              message: isType()
+                ? "올바른 이메일 주소가 아닙니다."
+                : "비밀번호는 영문, 숫자 조합 8자이상 입력해주세요.",
+            },
+            validate: async (value) => {
+              if (type === "email") {
+                const isDuplicate = await checkDuplicateEmail(value);
+                return isDuplicate ? "이미 사용중인 이메일입니다." : true;
+              }
+            },
+          })}
         />
-        {type === "email" ? null : (
+        {isType() ? null : (
           <Image
             className={styles.eyeIcon}
             src={changeEyeIcon ? eyeOnIcon : eyeOffIcon}
@@ -76,7 +89,10 @@ const Input = ({
           />
         )}
       </div>
-    </div>
+      {errors[`${type}`] && (
+        <small className={styles.errorMessage}>{message?.toString()}</small>
+      )}
+    </>
   );
 };
 

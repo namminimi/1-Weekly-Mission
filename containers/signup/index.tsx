@@ -5,71 +5,49 @@ import kakao from "@/public/img/png/Component 3.png";
 import Input from "@/components/Input";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/router";
-import { useState } from "react";
+
 import { API_URL } from "@/config/apiUrl";
 import { SignLayout } from "@/components/Layout";
+import { useForm } from "react-hook-form";
 
 const SignupContainer = () => {
-  const router = useRouter();
-  const userToken = window.localStorage.getItem("user");
-  const [reCheck, setReCheck] = useState("");
-  const [inputValue, setInputValue] = useState({
-    email: "",
-    password: "",
-    passwordCh: "",
+  const {
+    register,
+    handleSubmit: onSubmit,
+    formState,
+    watch,
+  } = useForm({
+    mode: "onBlur",
   });
+  const { isSubmitting } = formState;
+  const emailCurrent = watch("email");
 
-  if (userToken) {
-    router.push("/");
-  }
+  const handleSubmit = async (data: any) => {
+    const { email, password, passwordCh } = data;
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    console.log(name, value);
-    if (name === "email") {
-      setInputValue({ ...inputValue, email: value });
-    } else if (name === "password") {
-      setInputValue({ ...inputValue, password: value });
-    } else {
-      setInputValue({ ...inputValue, passwordCh: value });
-    }
-  };
-
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const { email, password } = inputValue;
-    if (email && password) {
+    if (email && password && passwordCh) {
       try {
         const res = await fetch(`${API_URL}sign-up`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(inputValue),
+          body: JSON.stringify(data),
         });
         if (res.ok) {
           const result = await res.json();
-          const { accessToken } = result.data;
-          window.localStorage.setItem("user", accessToken);
+
           alert("환영합니다.");
-          router.push("/folder");
+          //router.push("/folder");
         } else {
           throw new Error("회원가입 실패");
         }
       } catch {
-        setReCheck("disaccord");
+        console.log("회원가입  실패");
       }
     } else {
-      setReCheck("disaccord");
+      console.log("회원가입 못함");
     }
-  };
-
-  const inputProps = {
-    onChange,
-    reCheck,
-    setReCheck,
-    password: inputValue.password,
   };
   return (
     <SignLayout>
@@ -86,26 +64,38 @@ const SignupContainer = () => {
               로그인 하기
             </Link>
           </div>
-          <form className={styles.form} onSubmit={onSubmit}>
+          <form className={styles.form} onSubmit={onSubmit(handleSubmit)}>
             <div className={styles.inputBox}>
               <label className={styles.inputBoxLabel} htmlFor="email">
                 이메일
               </label>
-              <Input type={"email"} {...inputProps} />
+              <Input type={"email"} register={register} formState={formState} />
             </div>
             <div className={styles.inputBox}>
               <label className={styles.inputBoxLabel} htmlFor="password">
                 비밀번호
               </label>
-              <Input type={"password"} {...inputProps} />
+              <Input
+                type={"password"}
+                register={register}
+                formState={formState}
+              />
             </div>
             <div className={styles.inputBox}>
               <label className={styles.inputBoxLabel} htmlFor="password-check">
                 비밀번호 확인
               </label>
-              <Input type={"passwordCheck"} {...inputProps} />
+              <Input
+                type={"passwordCheck"}
+                register={register}
+                formState={formState}
+              />
             </div>
-            <button className={styles.joinBtn} type="submit">
+            <button
+              className={styles.joinBtn}
+              type="submit"
+              disabled={isSubmitting}
+            >
               회원가입
             </button>
           </form>
