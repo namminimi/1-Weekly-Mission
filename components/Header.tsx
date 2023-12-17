@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import logoImg from "@/public/img/png/Linkbrary.png";
-import { isLocation, isblock } from "@/utils/location";
+import { isLocation} from "@/utils/location";
 import Link from "next/link";
 import { AccountContext } from "@/contexts/AccountContext";
 import Image from "next/image";
@@ -16,7 +16,6 @@ const Header = () => {
       className={styles.header}
       style={{
         position: isLocation() ? "static" : "sticky",
-        display: isblock() ? "block" : "none",
       }}
     >
       <div className={styles.headerInner}>

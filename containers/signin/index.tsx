@@ -10,6 +10,7 @@ import { API_URL } from "@/config/apiUrl";
 import { useRouter } from "next/router";
 import { SignLayout } from "@/components/Layout";
 import { useForm } from "react-hook-form";
+import axios from "@/lib/axios";
 
 const SigninContainer = () => {
   const {
@@ -23,26 +24,20 @@ const SigninContainer = () => {
   const { isSubmitting } = formState;
 
   const handleSubmit = async (data: any) => {
-    console.log(data);
-    const { email, password, passwordCh } = data;
+    const { email, password} = data;
 
     if (email && password) {
       try {
-        const res = await fetch(`${API_URL}sign-in`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-        if (res.ok) {
+        const res = await axios.post('/sign-in', data)
+        console.log(res)
+        /* if (res.ok) {
           const result = await res.json();
 
           alert("환영합니다.");
           //router.push("/folder");
         } else {
           throw new Error("로그인 실패");
-        }
+        } */
       } catch {
         console.log("로그인 실패");
       }

@@ -20,10 +20,15 @@ const SignupContainer = () => {
     mode: "onBlur",
   });
   const { isSubmitting } = formState;
-  const emailCurrent = watch("email");
+  const passwordCh = watch('password')
 
   const handleSubmit = async (data: any) => {
-    const { email, password, passwordCh } = data;
+    const { email, password, passwordCheck } = data;
+    const newData = {
+      email,
+      password
+    }
+
 
     if (email && password && passwordCh) {
       try {
@@ -36,14 +41,13 @@ const SignupContainer = () => {
         });
         if (res.ok) {
           const result = await res.json();
-
           alert("환영합니다.");
           //router.push("/folder");
         } else {
           throw new Error("회원가입 실패");
         }
       } catch {
-        console.log("회원가입  실패");
+        console.log("회원가입 실패");
       }
     } else {
       console.log("회원가입 못함");
@@ -89,6 +93,7 @@ const SignupContainer = () => {
                 type={"passwordCheck"}
                 register={register}
                 formState={formState}
+                watch={passwordCh}
               />
             </div>
             <button

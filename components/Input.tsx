@@ -4,7 +4,7 @@ import Image from "next/image";
 import eyeOffIcon from "@/public/img/svg/eye-off.svg";
 import eyeOnIcon from "@/public/img/svg/eye-on.svg";
 
-import { FieldValues, FormState, UseFormRegister } from "react-hook-form";
+import { FieldValues, FormState, UseFormRegister, UseFormWatch } from "react-hook-form";
 import { REG_EXP } from "@/utils/constant";
 import { API_URL } from "@/config/apiUrl";
 
@@ -12,19 +12,27 @@ interface InputType {
   type: string;
   register: UseFormRegister<FieldValues>;
   formState: FormState<FieldValues>;
+  watch?: UseFormWatch<FieldValues>
 }
 
-const Input = ({ type, register, formState }: InputType) => {
+const Input = ({ type, register, formState, watch }: InputType) => {
   const { isSubmitted, errors } = formState;
   const [changeEyeIcon, setChangeEyeIcon] = useState<boolean>(false);
+  const location = window.location.pathname;
+  
 
-  const onClick = () => {
+  const handleClick = () => {
     setChangeEyeIcon(!changeEyeIcon);
   };
 
+  
   const isType = () => {
     return type === "email";
   };
+
+  const isSigninPage = () => {
+    return location.includes('signin')
+  }
 
   const checkDuplicateEmail = async (email: string) => {
     try {
@@ -66,16 +74,21 @@ const Input = ({ type, register, formState }: InputType) => {
             required: isType()
               ? "이메일을 입력해주세요"
               : "비밀번호를 입력해주세요",
-            pattern: {
-              value: REG_EXP[isType() ? "CHECK_EMAIL" : "CHECK_PASSWORD"],
-              message: isType()
-                ? "올바른 이메일 주소가 아닙니다."
-                : "비밀번호는 영문, 숫자 조합 8자이상 입력해주세요.",
-            },
+              ...(type !== 'passwordCheck' && {
+                pattern: {
+                  value: REG_EXP[isType() ? "CHECK_EMAIL" : "CHECK_PASSWORD"],
+                  message: isType()
+                    ? "올바른 이메일 주소가 아닙니다."
+                    : "비밀번호는 영문, 숫자 조합 8자이상 입력해주세요.",
+                },
+              }),
             validate: async (value) => {
-              if (type === "email") {
+              if (type === "email" && !isSigninPage()) {
                 const isDuplicate = await checkDuplicateEmail(value);
                 return isDuplicate ? "이미 사용중인 이메일입니다." : true;
+              }
+              if(type === 'passwordCheck') {
+                return value !== watch ? "비밀번호가 일치하지 않습니다" : true;
               }
             },
           })}
@@ -85,7 +98,7 @@ const Input = ({ type, register, formState }: InputType) => {
             className={styles.eyeIcon}
             src={changeEyeIcon ? eyeOnIcon : eyeOffIcon}
             alt="눈아이콘"
-            onClick={onClick}
+            onClick={handleClick}
           />
         )}
       </div>

@@ -7,11 +7,4 @@ export const isLocation = () => {
   }
 };
 
-export const isblock = () => {
-  const location = window.location.pathname;
-  if (location.indexOf("sign") > -1) {
-    return false;
-  } else {
-    return true;
-  }
-};
+
