@@ -47,3 +47,10 @@
   right: 15px;
   transform: translate(0%, -50%);
 }
+
+.errorMessage {
+  margin-top: 6px;
+  color: var(--linkbrary-red);
+  font-size: 14px;
+  font-weight: 400;
+}

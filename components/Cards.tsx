@@ -4,7 +4,7 @@ import styles from "./cards.module.css";
 import Link from "next/link";
 
 interface CardsType {
-  linkCardsData: { data: Links[] } | null;
+  linkCardsData: Links[];
   prevKey?: number | null;
   handleCebabClick?: (
     event: React.MouseEvent<HTMLImageElement>,
@@ -30,8 +30,6 @@ const Cards = ({
 }: CardsType) => {
   if (!linkCardsData) return;
 
-  const { data: linksData } = linkCardsData;
-
   const cardProps = {
     prevKey,
     handleCebabClick,
@@ -39,7 +37,7 @@ const Cards = ({
     iscebabClick,
   };
 
-  const newLinkData = linksData.filter((link) => {
+  const newLinkData = linkCardsData.filter((link) => {
     if (searchResult.length > 0) {
       const searchResultToLower = searchResult?.toLowerCase();
       const urlToLower = link.url ? link.url?.toLowerCase() : "";
@@ -52,10 +50,10 @@ const Cards = ({
         titleToLower.indexOf(searchResultToLower) > -1 ||
         desToLower.indexOf(searchResultToLower) > -1
       ) {
-        return linksData;
+        return linkCardsData;
       }
     } else {
-      return linksData;
+      return linkCardsData;
     }
   });
 

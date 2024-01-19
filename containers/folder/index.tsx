@@ -5,7 +5,7 @@ import UserFolder from "@/components/UserFolder";
 import Cards from "@/components/Cards";
 import ObserveAddInput from "@/components/ObserveAddInput";
 
-import { useFetch, useQueryFetch } from "@/hooks/useFetch";
+import { useNewFetch } from "@/hooks/useFetch";
 import ModalFolder from "@/modal/ModalFolder";
 import { Links, folderOptionType } from "@/dataType/dataType";
 import { AccountContext } from "@/contexts/AccountContext";
@@ -47,26 +47,38 @@ const FolderContainer = () => {
   const [iscebabClick, setIscebabClick] = useState<boolean>(false);
   const [newLink, setNewLink] = useState("");
   const [folderId, setFolderId] = useState(null);
-  const { id } = account?.data[0];
+
+  const { id } = account[0];
   const targetElement = useRef<HTMLDivElement>(null);
   const targetSecondElement = useRef<HTMLDivElement>(null);
   const userToken = window.localStorage.getItem("user");
   const router = useRouter();
 
   const { data: folderDataObject, errorMessage: foldersErrorMessage } =
-    useFetch(`users/${id}/folders`, id);
+    useNewFetch({
+      method: "get",
+      path: `folders`,
+    });
 
   const {
     data: linkCardsData,
     errorMessage: linksErrorMessage,
-  }: QueryFetchType = useQueryFetch(`users/${id}/links`, folderId, id);
+    fetchUrl,
+  } = useNewFetch({
+    method: "get",
+    path: folderId ? `folders/${folderId}/links` : `links`,
+  });
+
+  useEffect(() => {
+    fetchUrl();
+  }, [folderId]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         // entries는 관찰 대상 요소의 배열
         entries.forEach((entry) => {
-          /* observer */
+          // observer
           if (entry.isIntersecting && entry.target.className === "observer") {
             // 요소가 뷰포트에 들어왔을 때
             setIsVisible(true);
@@ -78,7 +90,7 @@ const FolderContainer = () => {
             setIsVisible(false);
           }
 
-          /* observerSecond */
+          // observerSecond
           if (
             entry.isIntersecting &&
             entry.target.className === "observerSecond"
@@ -94,8 +106,8 @@ const FolderContainer = () => {
       },
       {
         // 옵션: root, rootMargin, threshold
-        /*  root: targetElement.current, */
-        /* rootMargin: "50px", */
+        //root: targetElement.current,
+        //rootMargin: "50px",
         threshold: 0.3, // 요소의 30%가 보일 때 콜백 실행
       }
     );

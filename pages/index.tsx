@@ -1,5 +1,6 @@
 import MainContainer from "@/containers/main";
 
-export default function Home() {
+const Home = () => {
   return <MainContainer />;
-}
+};
+export default Home;

@@ -1,5 +1,6 @@
 .join {
-  height: 100vh;
+  min-height: 100vh;
+  max-height: fit-content;
   background: var(--linkbrary-bg);
 }
 
@@ -99,6 +100,10 @@
   font-weight: 600;
   border: 0;
   cursor: pointer;
+}
+
+.joinBtn:disabled {
+  background: var(--linkbrary-gray-20);
 }
 
 .joinFormSocial {

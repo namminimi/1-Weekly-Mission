@@ -6,10 +6,10 @@ import {
   useState,
 } from "react";
 import { User } from "@/dataType/dataType";
-import { useFetch } from "@/hooks/useFetch";
+import { useNewFetch } from "@/hooks/useFetch";
 
 interface AccountType {
-  account: { data: User[] };
+  account: User[];
   errorMessage: { message: string } | any;
   isVisible: boolean;
   isSecondVisible: boolean;
@@ -20,7 +20,7 @@ interface AccountType {
 }
 
 export const AccountContext = createContext<AccountType>({
-  account: { data: [] },
+  account: [],
   errorMessage: { message: "" },
   isVisible: false,
   isSecondVisible: false,
@@ -31,7 +31,10 @@ export const AccountContext = createContext<AccountType>({
 });
 
 export function AccountProvider({ children }: any) {
-  const { data: userData, errorMessage } = useFetch("users/1", 1);
+  const { data: userData, errorMessage } = useNewFetch({
+    path: "users/1",
+    param: 1,
+  });
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isSecondVisible, setIsSecondVisible] = useState<boolean>(false);
   const [searchResult, setSearchResult] = useState<string>("");

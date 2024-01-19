@@ -8,7 +8,7 @@ import Image from "next/image";
 import styles from "./userFolder.module.css";
 
 interface UserFolderType {
-  folderDataObject: { data: folders[] };
+  folderDataObject: folders[];
   folderId: string | null;
   handleListClick: (
     event: React.MouseEvent<HTMLLIElement | HTMLHeadingElement>,
@@ -89,8 +89,7 @@ const UserFolder = ({
 
   if (!folderDataObject) return;
 
-  const { data: folderData } = folderDataObject;
-  const newFolderData = [all, ...folderData];
+  const newFolderData = [all, ...folderDataObject];
 
   const onClick = (id: any) => {
     setFolderId(id !== 9999 ? id : null);

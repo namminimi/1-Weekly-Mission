@@ -1,5 +1,6 @@
 .login {
-  height: 100vh;
+  min-height: 100vh;
+  max-height: fit-content;
   background: var(--linkbrary-bg);
 }
 
